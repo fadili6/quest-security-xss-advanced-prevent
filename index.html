@@ -93,7 +93,7 @@
         userName = "applicant";
 
         if (userParam !== null) {
-            userName = userParam;
+            userName = DOMPurify.sanitize(userParam);
         }
 
         document.getElementById("welcome-text").innerHTML = "<h1>How do you do, " + userName + "?</h1>";
@@ -106,7 +106,7 @@
         input.addEventListener("input", updateValue);
 
         function updateValue(e) {
-            log.innerHTML = e.target.value;
+            log.innerHTML = DOMPurify.sanitize(e.target.value);
         }
 
         //  XSS vulnerability #3
@@ -118,14 +118,17 @@
         showButton.addEventListener("click", showHTML);
 
         function showHTML() {
-            htmlOutput.innerHTML = htmlInput.value;
+            htmlOutput.innerHTML = DOMPurify.sanitize(htmlInput.value);
         }
 
         //  XSS vulnerability #4
 
         const redir = params.get("goto");
         if (redir !== null && redir !== "null") {
-            document.location = redir;
+            const safeURL = DOMPurify.sanitize(redir);
+            if (safeURL.startsWith("http://") || safeURL.startsWith("https://")) {
+                document.location = safeURL;
+            }
         }
 
     </script>
